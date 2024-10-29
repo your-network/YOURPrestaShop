@@ -1,0 +1,7 @@
+views/js/snippet_*.js
+vendor/*
+.php-cs-fixer.cache
+.php-cs-fixer.dist.php
+composer.json
+composer.lock
+config.xml
