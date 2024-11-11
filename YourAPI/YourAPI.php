@@ -45,18 +45,12 @@ class YourAPI
      */
     public function getHeaders($body = null, $authorization = null, $accept = null)
     {
-        if ($authorization) {
-            $apiKey = 'Basic ' . $authorization;
-        } else {
-            $apiKey = 'Basic ' . self::REGISTRATION_API_KEY;
-        }
+        $apiKey = 'Basic ' . ($authorization ?? self::REGISTRATION_API_KEY);
 
         $headers = [
-            CURLOPT_HTTPHEADER => [
-                self::ACCEPT_KEY_HEADER . ': ' . $accept ?? self::TEXT_PLAIN_VALUE,
-                self::CONTENT_TYPE_HEADER . ': ' . self::APPLICATION_JSON_HEADER_VALUE,
-                self::AUTHORIZATION_KEY_HEADER . ': ' . $apiKey,
-            ],
+            self::ACCEPT_KEY_HEADER . ': ' . ($accept ?? self::TEXT_PLAIN_VALUE),
+            self::CONTENT_TYPE_HEADER . ': ' . self::APPLICATION_JSON_HEADER_VALUE,
+            self::AUTHORIZATION_KEY_HEADER . ': ' . $apiKey,
         ];
 
         return $headers;
@@ -75,31 +69,22 @@ class YourAPI
 
         $options = [
             CURLOPT_URL => self::BASE_URL . $path,
-        ] + $this->getHeaders($body, $authorization, $accept) + $this->getDefaultCurlOptions($method);
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $this->getHeaders($body, $authorization, $accept),
+            CURLOPT_CUSTOMREQUEST => $method,
+        ];
 
-        if ($method == self::HTTP_PATCH) {
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        } elseif ($method == self::HTTP_POST) {
-            curl_setopt($curl, CURLOPT_POST, true);
+        if ($method === 'POST' || $method === 'PATCH') {
+            $options[CURLOPT_POSTFIELDS] = json_encode($body);
         }
 
         curl_setopt_array($curl, $options);
 
-        if ($body != null) {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
-        }
-
         $response = curl_exec($curl);
-
-        $phpVersionHttpCode = version_compare(phpversion(), '5.5.0', '>') ? CURLINFO_RESPONSE_CODE : CURLINFO_HTTP_CODE;
-        $statusCode = curl_getinfo($curl, $phpVersionHttpCode);
+        $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($isHtml) {
-            return $response;
-        }
-
-        return ['response' => $response, 'status_code' => $statusCode];
+        return $isHtml ? $response : ['response' => $response, 'status_code' => $statusCode];
     }
 
     /**
