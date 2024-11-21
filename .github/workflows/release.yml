@@ -9,6 +9,13 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v4
+    - name: Create folder to zip
+      shell: bash
+      run: |
+        mkdir .tmp_hidden
+        mv ./* .tmp_hidden
+        mv ./.htaccess .tmp_hidden
+        mv .tmp_hidden sd_yourio
     - name: Zip asset
       uses: thedoctor0/zip-release@0.7.5
       with:
