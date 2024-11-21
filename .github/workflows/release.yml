@@ -13,10 +13,10 @@ jobs:
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: 'zip'
-        filename: 'sd_your.zip'
+        filename: 'sd_yourio.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig'
     - name: Upload asset
       uses: softprops/action-gh-release@v2
       # if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: sd_your.zip
+        files: sd_yourio.zip
