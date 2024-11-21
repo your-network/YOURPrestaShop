@@ -5,11 +5,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v4
     - name: Archive Release
-      uses: thedoctor0/zip-release@0.7.5
+      uses: thedoctor0/zip-release@0.7
       with:
         type: 'zip'
         filename: 'sd_your.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig'
+    - name: Upload Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "sd_your.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
