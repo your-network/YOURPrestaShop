@@ -8,8 +8,8 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- * @author    Simul Digital
- * @copyright 2020-2024 Simul Digital
+ * @author YOURAI
+ * @copyright 2020-2024 YOURAI
  * @license LICENSE.txt
  */
 if (!defined('_PS_VERSION_')) {
@@ -45,12 +45,18 @@ class YourAPI
      */
     public function getHeaders($body = null, $authorization = null, $accept = null)
     {
-        $apiKey = 'Basic ' . ($authorization ?? self::REGISTRATION_API_KEY);
+        if ($authorization) {
+            $apiKey = 'Basic ' . $authorization;
+        } else {
+            $apiKey = 'Basic ' . self::REGISTRATION_API_KEY;
+        }
 
         $headers = [
-            self::ACCEPT_KEY_HEADER . ': ' . ($accept ?? self::TEXT_PLAIN_VALUE),
-            self::CONTENT_TYPE_HEADER . ': ' . self::APPLICATION_JSON_HEADER_VALUE,
-            self::AUTHORIZATION_KEY_HEADER . ': ' . $apiKey,
+            CURLOPT_HTTPHEADER => [
+                self::ACCEPT_KEY_HEADER . ': ' . $accept ?? self::TEXT_PLAIN_VALUE,
+                self::CONTENT_TYPE_HEADER . ': ' . self::APPLICATION_JSON_HEADER_VALUE,
+                self::AUTHORIZATION_KEY_HEADER . ': ' . $apiKey,
+            ],
         ];
 
         return $headers;
@@ -69,22 +75,31 @@ class YourAPI
 
         $options = [
             CURLOPT_URL => self::BASE_URL . $path,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => $this->getHeaders($body, $authorization, $accept),
-            CURLOPT_CUSTOMREQUEST => $method,
-        ];
+        ] + $this->getHeaders($body, $authorization, $accept) + $this->getDefaultCurlOptions($method);
 
-        if ($method === 'POST' || $method === 'PATCH') {
-            $options[CURLOPT_POSTFIELDS] = json_encode($body);
+        if ($method == self::HTTP_PATCH) {
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        } elseif ($method == self::HTTP_POST) {
+            curl_setopt($curl, CURLOPT_POST, true);
         }
 
         curl_setopt_array($curl, $options);
 
+        if ($body != null) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
+        }
+
         $response = curl_exec($curl);
-        $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        $phpVersionHttpCode = version_compare(phpversion(), '5.5.0', '>') ? CURLINFO_RESPONSE_CODE : CURLINFO_HTTP_CODE;
+        $statusCode = curl_getinfo($curl, $phpVersionHttpCode);
         curl_close($curl);
 
-        return $isHtml ? $response : ['response' => $response, 'status_code' => $statusCode];
+        if ($isHtml) {
+            return $response;
+        }
+
+        return ['response' => $response, 'status_code' => $statusCode];
     }
 
     /**

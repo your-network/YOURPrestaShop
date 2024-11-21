@@ -8,8 +8,8 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- * @author    Simul Digital
- * @copyright 2020-2024 Simul Digital
+ * @author YOURAI
+ * @copyright 2020-2024 YOURAI
  * @license LICENSE.txt
  */
 if (!defined('_PS_VERSION_')) {
@@ -24,48 +24,13 @@ class Sd_YourioYourappModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $endpointParam = Tools::getValue('endpoint_param');
+        $handler = $this->getHandlerForEndpoint($endpointParam);
 
-        if ($endpointParam) {
-            if ($endpointParam == 'Shop/Register') {
-                $this->handleShopRegisterBlocks();
-            } else {
-                $endpointParam = '/Prestashop/' . $endpointParam;
-                $body = (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PATCH'])) ? json_decode(Tools::file_get_contents('php://input'), true) : null;
-
-                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                    $params = Tools::getAllValues();
-
-                    foreach (['endpoint_param', 'fc', 'module', 'controller'] as $excludedParam) {
-                        unset($params[$excludedParam]);
-                    }
-
-                    $queryString = http_build_query($params);
-                    if ($queryString && $queryString != '') {
-                        $endpointParam .= $queryString ? '?' . $queryString : '';
-                    }
-                }
-
-                $yourApi = new YourAPI();
-                $response = $yourApi->request(
-                    $endpointParam,
-                    $_SERVER['REQUEST_METHOD'],
-                    $body,
-                    ConfigurationHelper::getYourApiKey()
-                );
-
-                $this->sendResponse($response['response'], $response['status_code']);
-            }
-        } else {
-            $this->handleError('Endpoint parameter missing', 400);
-        }
-
-        // $handler = $this->getHandlerForEndpoint($endpointParam);
-
-        /*if ($handler && method_exists($this, $handler)) {
+        if ($handler && method_exists($this, $handler)) {
             $this->$handler($endpointParam);
         } else {
             $this->handleError('Endpoint not found: ' . htmlspecialchars($endpointParam), 404);
-        }*/
+        }
     }
 
     /**

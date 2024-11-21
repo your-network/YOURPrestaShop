@@ -7,8 +7,8 @@
  *
  * You must not modify, adapt or create derivative works of this source code
  *
- * @author    Simul Digital
- * @copyright 2016-2024 Simul Digital
+ * @author    YOURAI
+ * @copyright 2016-2024 YOURAI
  * @license LICENSE.txt
  */
 
