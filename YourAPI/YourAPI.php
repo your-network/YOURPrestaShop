@@ -21,7 +21,7 @@ class YourAPI
     /**
      * Host and versions
      */
-    public const BASE_URL = 'https://integrations-acceptance.your.io';
+    public const BASE_URL = 'https://61c3-2a02-a457-a280-1-7141-5e5b-b04d-3b47.ngrok-free.app';
     public const YOUR_API_VERSION = 'v1';
     /**
      * Request options
@@ -37,7 +37,7 @@ class YourAPI
     public const CONTENT_LENGTH_HEADER = 'Content-Length';
     public const REGISTRATION_API_KEY = 'afc29d1a-8f4b-4e99-a8b9-3e23f7f7602d';
     public const ERROR_MALFORMED_RESPONSE_BODY = 'Response from API could not be decoded from JSON, check response body';
-
+    
     /**
      *  Build headers for the all API calls
      *
