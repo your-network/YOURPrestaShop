@@ -21,7 +21,7 @@ class YourAPI
     /**
      * Host and versions
      */
-    public const BASE_URL = 'https://61c3-2a02-a457-a280-1-7141-5e5b-b04d-3b47.ngrok-free.app';
+    public const BASE_URL = 'https://quickly-smart-macaque.ngrok-free.app';
     public const YOUR_API_VERSION = 'v1';
     /**
      * Request options
